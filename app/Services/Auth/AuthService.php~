@@ -11,6 +11,4 @@ interface AuthService extends BaseService{
     public function register($credentials);
 
     public function responseWithToken($token);
-
-    public function logout();
 }

@@ -5,6 +5,7 @@ namespace App\Services\Auth;
 use App\Models\User;
 use LaravelEasyRepository\ServiceApi;
 use App\Repositories\Auth\AuthRepository;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthServiceImplement extends ServiceApi implements AuthService{
 
@@ -31,7 +32,7 @@ class AuthServiceImplement extends ServiceApi implements AuthService{
 
             return $this->setCode(200)
                 ->setMessage('Login success')
-                ->setResult($this->responseWithToken($token));
+                ->setResult($this->responseWithToken($token)->getResult());
         } catch (Exception $e) {
             return $this->exceptionResponse($e);
         }
@@ -61,5 +62,20 @@ class AuthServiceImplement extends ServiceApi implements AuthService{
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 1
         ]);
+    }
+
+    public function logout()
+    {
+        try {
+            $removeToken = JWTAuth::invalidate(JWTAuth::getToken());
+
+            if($removeToken) {
+                return $this->setStatus(true)
+                    ->setMessage('Logout success')
+                    ->setCode(200);
+            }
+        } catch (Exception $e) {
+            return $this->exceptionResponse($e);
+        }
     }
 }
